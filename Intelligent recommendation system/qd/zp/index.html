@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./test.css" />
+    <link rel="stylesheet" href="./test.js" />
+    <script src="./page.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0px;
+        font-size: 12px;
+      }
+      a {
+        text-decoration: none;
+      }
+      ul {
+        list-style: none;
+      }
+      .joblist {
+        height: 300px;
+      }
+
+      .joblist .row {
+        margin-top: 20px;
+      }
+      .joblist .row:first-child {
+        margin-top: 0;
+      }
+      .btn {
+        background-color: rgb(243, 182, 132);
+        border-radius: 40% 20%;
+        display: block;
+        width: 150px;
+        height: 50px;
+        margin: 20px auto;
+        line-height: 50px;
+        box-shadow: 0 8px 16px 0 rgba(240, 120, 64, 0.2),
+          0 6px 20px 0 rgba(236, 179, 22, 0.19);
+        text-align: center;
+        color: #000;
+        font-size: 16px;
+      }
+      .btn:hover {
+        box-shadow: 0 8px 16px 0 rgba(240, 156, 31, 0.24),
+          0 6px 20px 0 rgba(230, 146, 21, 0.19);
+        counter-reset: #fff;
+        font-weight: bold;
+      }
+      #con {
+        margin-top: 20px;
+        text-align: center;
+      }
+      #con div {
+        line-height: 30px;
+      }
+      .page {
+        margin: 60px auto 60px;
+        text-align: center;
+        font-size: 20px;
+      }
+    </style>
+    <script src="./jquery-3.2.1.min.js"></script>
+    <script>
+      $(function () {
+        $.ajax({
+          contentType: "application/x-www-form-urlencoded",
+          type: 'GET',
+          
+          url: '2021-11-01.json',
+          data: { name: name },
+          dataType: 'json',
+          success: function (result) {
+            var dataObj = result,
+              con = ''
+            $.each(dataObj, function (index, item) {
+              con +=
+                '<div class="jobitem">\
+              <h1><span class="jobname">' +
+                index +
+                '</span><span class="salary">' +
+                item.salary60 +
+                '</span></h1>\
+              <h2>' +
+                item.companyName +
+                '</h2>\
+              <p>' +
+                '招聘人数： ' +
+                item.recruitNumber +
+                '<img class="icon" style="margin-left: 24px;width:23px;height:23px;width: 23px;vertical-align: middle;" src="./num01.jpg">' +
+                item.education +
+                '<img class="icon" style="margin-left: 24px;width:23px;height:23px;width: 23px;vertical-align: middle;" src="./num.png">' +
+                item.companySize +
+                '\
+              </p>\
+            </div>'
+            })
+            console.log(con)
+            $('#con').html(con)
+            console.log($('#con .jobitem').length)
+
+            var allPages
+            var cnt
+            var indexs
+            var boxes
+            $(function () {
+              var $div = $('jobitem')
+              var $pages = $('#pages1')
+              var pgindex = 1 //当前页
+              var eachCnt = 15 //每页显示个数
+              boxes = $('#con .jobitem')
+              console.log(boxes)
+              cnt = boxes.length
+              console.log(cnt)
+              indexs = new Array(cnt)
+              for (var i = 0; i < cnt; i++) {
+                indexs[i] = i
+              }
+              allPages = Math.ceil(cnt / eachCnt)
+
+              $pages.html('共 ' + allPages + ' 页')
+              //   console.log($pages);
+              showPage(1)
+              for (var i = 0; i < allPages; i++) {
+                // $pages.append("<a href=\"javascript:showPage('"+ (i+1) +"');\"> "+ (i+1) +" </a>");
+              }
+              $pages.append(
+                "<a class='aaa' style='margin-left:50px;font-size:20px' data-id='-1'>上一页</a> <a class='aaa' style='margin-left:50px;font-size:20px' data-id='1'>下一页</a>",
+              )
+            })
+
+            $(document).on('click', '.aaa', function () {
+              var value = $(this).attr('data-id')
+              console.log('value', value)
+              console.log('pgindex', pgindex)
+              try {
+                value == '-1' ? showPage(pgindex - 1) : showPage(pgindex + 1)
+              } catch (e) {}
+            })
+            // function gotopage(value) {
+            //   debugger
+            //   alert('gotoPage')
+            //   try {
+            //     value == '-1' ? showPage(pgindex - 1) : showPage(pgindex + 1)
+            //   } catch (e) {}
+            // }
+            function showPage(pageIndex) {
+              if (pageIndex == 0 || pageIndex == allPages + 1) {
+                return
+              }
+              var start = (pageIndex - 1) * 15
+              var end = start + 15
+              end = end > cnt ? cnt : end
+              var subIndexs = indexs.slice(start, end)
+              for (var i = 0; i < cnt; i++) {
+                if (contains(i, subIndexs)) {
+                  boxes.eq(i).show()
+                } else {
+                  boxes.eq(i).hide()
+                }
+              }
+              pgindex = pageIndex
+            }
+            var contains = function (element, arr) {
+              for (var i = 0; i < arr.length; i++) {
+                if (arr[i] == element) {
+                  return true
+                }
+              }
+              return false
+            }
+          },
+        })
+      })
+    </script>
+    <script language="javascript">     
+      function exec1(command) 
+      {     
+        var ws = new ActiveXObject("WScript.Shell");      
+        ws.run(command);
+      }     
+      </script>
+  </head>
+  <body>
+    <button onclick="exec1('python test.py')">运行 python</button>
+    <div id="joblist">
+      <a class="btn" href="javascript:;">zlzp爬虫信息</a>
+      <div id="con">
+        <!-- <div class="jobitem"> -->
+      </div>
+    </div>
+
+    <!-- <div>                                     
+        <div class="in_news_nr" id="rdjggs">
+            <div class="in_news_list_item clear"</div>
+        </div>
+        </div> 
+    -->
+    <div class="page clear" id="pages1"></div>
+    <div>
+      上传文件 ： <input type="file" name = "file" id = "fileId" /> 
+      
+      <button  type = "submit" name = "btn" value = "提交" id = "btnId" onclick="check()">提交</button> 
+  </div>
+  
+  <script>
+  
+      function check() {
+       alert("aaa")
+          var objFile = document.getElementById("fileId");
+          if(objFile.value == "") {
+              alert("不能空")
+          }
+      
+          console.log(objFile.files[0].size); // 文件字节数
+          
+          var files = $('#fileId').prop('files');//获取到文件列表
+          if(files.length == 0){
+              alert('请选择文件');
+          }else{
+              var reader = new FileReader();//新建一个FileReader
+              reader.readAsText(files[0], "UTF-8");//读取文件 
+              reader.onload = function(evt){ //读取完文件之后会回来这里
+                  var fileString = evt.target.result; // 读取文件内容
+                  console.log(fileString)
+          }
+      }
+      
+  }
+  </script>
+  </body>
+</html>
